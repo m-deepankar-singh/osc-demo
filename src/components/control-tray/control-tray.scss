@@ -86,7 +86,7 @@
     background-color: var(--Red-500);
     width: calc(100% + var(--volume) * 2);
     height: calc(100% + var(--volume) * 2);
-    border-radius: 24px;
+    border-radius: 50%;
     transition: all 0.02s ease-in-out;
   }
 }

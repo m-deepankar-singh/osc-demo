@@ -1,0 +1,246 @@
+.submissions-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .upload-container {
+    background: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    h1 {
+      margin-bottom: 2rem;
+      color: #333;
+      text-align: center;
+    }
+  }
+
+  .upload-box {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+
+    .size-limit-warning {
+      color: #666;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .file-input {
+      margin-bottom: 1rem;
+    }
+
+    .file-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin: 1rem 0;
+      color: #666;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin: 0.5rem;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    .upload-button {
+      background-color: #4CAF50;
+      color: white;
+
+      &:hover:not(:disabled) {
+        background-color: #45a049;
+      }
+    }
+
+    .analyze-button {
+      background-color: #2196F3;
+      color: white;
+
+      &:hover {
+        background-color: #1976D2;
+      }
+    }
+  }
+
+  .status-message {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 4px;
+    font-weight: 500;
+
+    &.success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    &.error {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+  }
+}
+
+.analysis-result {
+  padding: 1.5rem;
+  max-height: 80vh;
+  overflow-y: auto;
+
+  .final-verdict {
+    font-size: 1.25rem;
+    font-weight: 600;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
+    text-align: center;
+
+    &.approved {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    &.rejected {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+  }
+
+  .failing-criteria {
+    background-color: #fff3e0;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
+
+    h2 {
+      color: #e65100;
+      margin-bottom: 0.5rem;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        color: #f57c00;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+
+  .requirement-section {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    h2 {
+      margin-bottom: 1rem;
+      color: #333;
+      font-size: 1.2rem;
+    }
+
+    .requirement-item {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+
+      &:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+
+      .requirement-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+      }
+
+      .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        font-weight: 600;
+
+        &.pass {
+          background-color: #e8f5e9;
+          color: #2e7d32;
+        }
+
+        &.fail {
+          background-color: #ffebee;
+          color: #c62828;
+        }
+
+        &.partial {
+          background-color: #fff3e0;
+          color: #f57c00;
+        }
+      }
+
+      .requirement-details {
+        color: #666;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+    }
+  }
+
+  .content-summary {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+
+    h2 {
+      margin-bottom: 1rem;
+      color: #333;
+      font-size: 1.2rem;
+    }
+
+    .summary-item {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+
+      &:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+
+      .summary-header {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 0.5rem;
+      }
+
+      .summary-content {
+        color: #666;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+    }
+  }
+} 

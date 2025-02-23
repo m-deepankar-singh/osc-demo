@@ -1,0 +1,99 @@
+.control-bubble {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+
+  .bubble-toggle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--Blue-500);
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 2;
+
+    &:hover {
+      transform: scale(1.05);
+      background: var(--Blue-600);
+    }
+
+    .material-symbols-outlined {
+      font-size: 24px;
+    }
+  }
+
+  .bubble-content {
+    position: absolute;
+    right: 56px;
+    bottom: 0;
+    display: flex;
+    gap: 0.75rem;
+    background: var(--Neutral-5);
+    padding: 0.5rem;
+    border-radius: 32px;
+    opacity: 0;
+    transform: translateX(20px);
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--Neutral-20);
+
+    .action-button {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--Neutral-5);
+      border: 1px solid var(--Neutral-20);
+      color: var(--Neutral-60);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        transform: translateY(-2px);
+        background: var(--Neutral-10);
+      }
+
+      &.mic-button {
+        background-color: var(--accent-red);
+        color: white;
+
+        &:hover {
+          background-color: var(--Red-400);
+        }
+      }
+
+      .material-symbols-outlined {
+        font-size: 20px;
+      }
+    }
+  }
+
+  &.expanded {
+    .bubble-content {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .bubble-toggle {
+      background: var(--Neutral-60);
+
+      &:hover {
+        background: var(--Neutral-70);
+      }
+    }
+  }
+} 

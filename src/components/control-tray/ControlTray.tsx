@@ -16,13 +16,14 @@
 
 import cn from "classnames";
 
-import { memo, ReactNode, RefObject, useEffect, useRef, useState } from "react";
+import { memo, ReactNode, RefObject, useEffect, useRef, useState, useMemo } from "react";
 import { useLiveAPIContext } from "../../contexts/LiveAPIContext";
 import { UseMediaStreamResult } from "../../hooks/use-media-stream-mux";
 import { useScreenCapture } from "../../hooks/use-screen-capture";
 import { useWebcam } from "../../hooks/use-webcam";
 import { AudioRecorder } from "../../lib/audio-recorder";
 import AudioPulse from "../audio-pulse/AudioPulse";
+import ChatBubble from "../chat-bubble/ChatBubble";
 import "./control-tray.scss";
 
 export type ControlTrayProps = {
@@ -62,18 +63,43 @@ function ControlTray({
   onVideoStreamChange = () => {},
   supportsVideo,
 }: ControlTrayProps) {
-  const videoStreams = [useWebcam(), useScreenCapture()];
+  const webcam = useWebcam();
+  const screenCapture = useScreenCapture();
+  const videoStreams = useMemo(() => [webcam, screenCapture], [webcam, screenCapture]);
   const [activeVideoStream, setActiveVideoStream] =
     useState<MediaStream | null>(null);
-  const [webcam, screenCapture] = videoStreams;
   const [inVolume, setInVolume] = useState(0);
   const [audioRecorder] = useState(() => new AudioRecorder());
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(true);
   const renderCanvasRef = useRef<HTMLCanvasElement>(null);
   const connectButtonRef = useRef<HTMLButtonElement>(null);
+  const mountedRef = useRef(true);
 
   const { client, connected, connect, disconnect, volume } =
     useLiveAPIContext();
+
+  // Store cleanup functions in a ref to avoid dependency cycles
+  const cleanupRef = useRef(() => {
+    audioRecorder.stop();
+    videoStreams.forEach((stream) => stream.stop());
+  });
+
+  // Update cleanup function when dependencies change
+  useEffect(() => {
+    cleanupRef.current = () => {
+      audioRecorder.stop();
+      videoStreams.forEach((stream) => stream.stop());
+    };
+  }, [audioRecorder, videoStreams]);
+
+  // Component mount/unmount effect
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      cleanupRef.current();
+    };
+  }, []);
 
   useEffect(() => {
     if (!connected && connectButtonRef.current) {
@@ -144,73 +170,80 @@ function ControlTray({
 
   //handler for swapping from one video-stream to the next
   const changeStreams = (next?: UseMediaStreamResult) => async () => {
-    if (next) {
-      const mediaStream = await next.start();
-      setActiveVideoStream(mediaStream);
-      onVideoStreamChange(mediaStream);
-    } else {
-      setActiveVideoStream(null);
-      onVideoStreamChange(null);
-    }
+    try {
+      if (next) {
+        const mediaStream = await next.start();
+        setActiveVideoStream(mediaStream);
+        onVideoStreamChange(mediaStream);
+      } else {
+        setActiveVideoStream(null);
+        onVideoStreamChange(null);
+      }
 
-    videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
+      videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
+    } catch (error) {
+      // Handle permission denied or other errors
+      if (error instanceof Error) {
+        if (error.name === 'NotAllowedError' || error.message.includes('Permission denied')) {
+          console.warn('Screen sharing permission was denied');
+          // Stop any existing streams
+          videoStreams.forEach((stream) => stream.stop());
+          setActiveVideoStream(null);
+          onVideoStreamChange(null);
+        } else {
+          console.error('Error accessing media stream:', error);
+        }
+      }
+    }
   };
 
   return (
-    <section className="control-tray">
-      <canvas style={{ display: "none" }} ref={renderCanvasRef} />
-      <nav className={cn("actions-nav", { disabled: !connected })}>
-        <button
-          className={cn("action-button mic-button")}
-          onClick={() => setMuted(!muted)}
-        >
-          {!muted ? (
-            <span className="material-symbols-outlined filled">mic</span>
-          ) : (
-            <span className="material-symbols-outlined filled">mic_off</span>
-          )}
-        </button>
-
-        <div className="action-button no-action outlined">
-          <AudioPulse volume={volume} active={connected} hover={false} />
-        </div>
-
-        {supportsVideo && (
-          <>
-            <MediaStreamButton
-              isStreaming={screenCapture.isStreaming}
-              start={changeStreams(screenCapture)}
-              stop={changeStreams()}
-              onIcon="cancel_presentation"
-              offIcon="present_to_all"
-            />
-            <MediaStreamButton
-              isStreaming={webcam.isStreaming}
-              start={changeStreams(webcam)}
-              stop={changeStreams()}
-              onIcon="videocam_off"
-              offIcon="videocam"
-            />
-          </>
+    <ChatBubble>
+      <button
+        className={cn("action-button mic-button")}
+        onClick={() => setMuted(!muted)}
+      >
+        {!muted ? (
+          <span className="material-symbols-outlined filled">mic</span>
+        ) : (
+          <span className="material-symbols-outlined filled">mic_off</span>
         )}
-        {children}
-      </nav>
+      </button>
 
-      <div className={cn("connection-container", { connected })}>
-        <div className="connection-button-container">
-          <button
-            ref={connectButtonRef}
-            className={cn("action-button connect-toggle", { connected })}
-            onClick={connected ? disconnect : connect}
-          >
-            <span className="material-symbols-outlined filled">
-              {connected ? "pause" : "play_arrow"}
-            </span>
-          </button>
-        </div>
-        <span className="text-indicator">Streaming</span>
+      <div className="action-button no-action outlined">
+        <AudioPulse volume={volume} active={connected} hover={false} />
       </div>
-    </section>
+
+      {supportsVideo && (
+        <>
+          <MediaStreamButton
+            isStreaming={screenCapture.isStreaming}
+            start={changeStreams(screenCapture)}
+            stop={changeStreams()}
+            onIcon="cancel_presentation"
+            offIcon="present_to_all"
+          />
+          <MediaStreamButton
+            isStreaming={webcam.isStreaming}
+            start={changeStreams(webcam)}
+            stop={changeStreams()}
+            onIcon="videocam_off"
+            offIcon="videocam"
+          />
+        </>
+      )}
+      {children}
+
+      <button
+        ref={connectButtonRef}
+        className={cn("action-button", { connected })}
+        onClick={connected ? disconnect : connect}
+      >
+        <span className="material-symbols-outlined filled">
+          {connected ? "pause" : "play_arrow"}
+        </span>
+      </button>
+    </ChatBubble>
   );
 }
 

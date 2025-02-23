@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-import { useRef, useState } from "react";
+import React, { useRef, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import "./App.scss";
 import { LiveAPIProvider } from "./contexts/LiveAPIContext";
+import { CourseProvider } from "./contexts/CourseContext";
 import SidePanel from "./components/side-panel/SidePanel";
 import { Altair } from "./components/altair/Altair";
 import ControlTray from "./components/control-tray/ControlTray";
+import CoursesPage from "./pages/CoursesPage";
+import CourseDetails from "./pages/CourseDetails";
+import SubmissionsPage from "./pages/SubmissionsPage";
+import ExamPage from "./pages/ExamPage";
+import { DeepResearchPortal } from "./components/DeepResearch/DeepResearchPortal";
 import cn from "classnames";
 
 const API_KEY = process.env.REACT_APP_GEMINI_API_KEY as string;
@@ -30,42 +37,62 @@ if (typeof API_KEY !== "string") {
 const host = "generativelanguage.googleapis.com";
 const uri = `wss://${host}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent`;
 
-function App() {
-  // this video reference is used for displaying the active stream, whether that is the webcam or screen capture
-  // feel free to style as you see fit
+const AppContent = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  // either the screen capture, the video or null, if null we hide it
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
+  const location = useLocation();
+  const isCoursePage = location.pathname.startsWith('/courses/') && !location.pathname.includes('/deep-research');
 
   return (
-    <div className="App">
-      <LiveAPIProvider url={uri} apiKey={API_KEY}>
-        <div className="streaming-console">
-          <SidePanel />
-          <main>
-            <div className="main-app-area">
-              {/* APP goes here */}
-              <Altair />
-              <video
-                className={cn("stream", {
-                  hidden: !videoRef.current || !videoStream,
-                })}
-                ref={videoRef}
-                autoPlay
-                playsInline
-              />
-            </div>
+    <div className="streaming-console">
+      <SidePanel />
+      <main>
+        <Routes>
+          <Route 
+            path="/" 
+            element={
+              <div className="main-app-area">
+                <Altair />
+                <video
+                  className={cn("stream", {
+                    hidden: !videoRef.current || !videoStream,
+                  })}
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                />
+              </div>
+            } 
+          />
+          <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/courses/deep-research" element={<DeepResearchPortal />} />
+          <Route path="/courses/:courseId" element={<CourseDetails />} />
+          <Route path="/submissions" element={<SubmissionsPage />} />
+          <Route path="/exam" element={<ExamPage />} />
+        </Routes>
 
-            <ControlTray
-              videoRef={videoRef}
-              supportsVideo={true}
-              onVideoStreamChange={setVideoStream}
-            >
-              {/* put your own buttons here */}
-            </ControlTray>
-          </main>
-        </div>
-      </LiveAPIProvider>
+        {isCoursePage && (
+          <ControlTray
+            videoRef={videoRef}
+            supportsVideo={true}
+            onVideoStreamChange={setVideoStream}
+          />
+        )}
+      </main>
+    </div>
+  );
+};
+
+function App() {
+  return (
+    <div className="App">
+      <CourseProvider>
+        <LiveAPIProvider url={uri} apiKey={API_KEY}>
+          <Router>
+            <AppContent />
+          </Router>
+        </LiveAPIProvider>
+      </CourseProvider>
     </div>
   );
 }

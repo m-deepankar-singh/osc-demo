@@ -23,9 +23,11 @@ import { LiveConfig } from "../multimodal-live-types";
 import { AudioStreamer } from "../lib/audio-streamer";
 import { audioContext } from "../lib/utils";
 import VolMeterWorket from "../lib/worklets/vol-meter";
+import { CourseAwareClient } from "../lib/course-aware-client";
+import { useCourseContext } from "../contexts/CourseContext";
 
 export type UseLiveAPIResults = {
-  client: MultimodalLiveClient;
+  client: MultimodalLiveClient | CourseAwareClient;
   setConfig: (config: LiveConfig) => void;
   config: LiveConfig;
   connected: boolean;
@@ -38,15 +40,31 @@ export function useLiveAPI({
   url,
   apiKey,
 }: MultimodalLiveAPIClientConnection): UseLiveAPIResults {
-  const client = useMemo(
+  const baseClient = useMemo(
     () => new MultimodalLiveClient({ url, apiKey }),
     [url, apiKey],
   );
-  const audioStreamerRef = useRef<AudioStreamer | null>(null);
+  
+  const { courseContext, markContextAsSent, language } = useCourseContext();
+  
+  const client = useMemo(() => {
+    if (courseContext) {
+      return new CourseAwareClient(baseClient, courseContext, language, markContextAsSent);
+    }
+    return baseClient;
+  }, [baseClient, courseContext, language, markContextAsSent]);
 
+  const audioStreamerRef = useRef<AudioStreamer | null>(null);
   const [connected, setConnected] = useState(false);
   const [config, setConfig] = useState<LiveConfig>({
     model: "models/gemini-2.0-flash-exp",
+    generationConfig: {
+      responseModalities: "audio",
+      temperature: 0.3,
+      speechConfig: {
+        voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
+      },
+    },
   });
   const [volume, setVolume] = useState(0);
 
@@ -90,7 +108,6 @@ export function useLiveAPI({
   }, [client]);
 
   const connect = useCallback(async () => {
-    console.log(config);
     if (!config) {
       throw new Error("config has not been set");
     }
@@ -102,12 +119,12 @@ export function useLiveAPI({
   const disconnect = useCallback(async () => {
     client.disconnect();
     setConnected(false);
-  }, [setConnected, client]);
+  }, [client, setConnected]);
 
   return {
     client,
-    config,
     setConfig,
+    config,
     connected,
     connect,
     disconnect,

@@ -1,0 +1,367 @@
+.deep-research-portal {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+
+  .portal-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    flex-shrink: 0;
+
+    h1 {
+      font-size: 2.5rem;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+
+    .portal-description {
+      font-size: 1.1rem;
+      color: #666;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  }
+
+  .research-options {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    min-height: 0; // Important for flex child scrolling
+    overflow: auto;
+
+    .new-research {
+      padding: 2rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      text-align: center;
+
+      h2 {
+        margin-bottom: 1.5rem;
+        color: #333;
+      }
+
+      .start-research-button {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: #0056b3;
+        }
+      }
+    }
+
+    .research-tips {
+      padding: 1.5rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+
+      h3 {
+        color: #333;
+        margin-bottom: 1rem;
+      }
+
+      ul {
+        list-style-type: none;
+        padding: 0;
+
+        li {
+          margin-bottom: 0.8rem;
+          color: #555;
+          padding-left: 1.5rem;
+          position: relative;
+
+          &:before {
+            content: "•";
+            color: #007bff;
+            position: absolute;
+            left: 0;
+          }
+        }
+      }
+    }
+  }
+
+  // When deep research is active
+  .deep-research {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-top: -2rem;
+    position: relative;
+
+    .deep-research-header {
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: transparent;
+      margin: -2rem -2rem 2rem -2rem;
+      padding: 0.5rem 1rem;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      z-index: 100;
+
+      .close-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        color: #666;
+        transition: color 0.2s, transform 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
+
+        &:hover {
+          color: #333;
+          background-color: rgba(0, 0, 0, 0.05);
+          transform: scale(1.05);
+        }
+      }
+    }
+
+    .research-form,
+    .research-progress,
+    .results-section {
+      position: relative;
+      z-index: 1;
+      margin-top: 2rem;
+    }
+
+    .research-form {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-weight: 500;
+      }
+
+      textarea {
+        width: 100%;
+        padding: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+        min-height: 100px;
+        font-size: 1rem;
+
+        &:focus {
+          border-color: #007bff;
+          outline: none;
+        }
+      }
+    }
+
+    .form-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+
+      .range-value {
+        margin-left: 1rem;
+        color: #666;
+      }
+    }
+
+    .submit-button {
+      width: 100%;
+      padding: 1rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #0056b3;
+      }
+
+      &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+    }
+
+    .results-section {
+      position: relative;
+      margin-top: 2rem;
+      
+      .loading-spinner-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(4px);
+      }
+
+      .report-container {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        margin-top: 1rem;
+
+        .report-main {
+          background: #f8f9fa;
+          padding: 2rem;
+          border-radius: 8px;
+          overflow-x: auto;
+        }
+
+        .report-sidebar {
+          .sidebar-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+
+            h4 {
+              margin-bottom: 1rem;
+              color: #333;
+            }
+
+            .source-link {
+              display: block;
+              color: #007bff;
+              text-decoration: none;
+              margin-bottom: 0.5rem;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .research-progress {
+      position: relative;
+      text-align: center;
+      padding: 2rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin: 2rem 0;
+
+      .loading-spinner-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        background: rgba(248, 249, 250, 0.9);
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+      }
+
+      .progress-bar {
+        height: 8px;
+        background: #eee;
+        border-radius: 4px;
+        margin: 1rem 0;
+        overflow: hidden;
+
+        .progress {
+          height: 100%;
+          background: #007bff;
+          transition: width 0.3s ease;
+        }
+      }
+
+      .progress-details {
+        display: flex;
+        justify-content: space-around;
+        color: #666;
+        margin-bottom: 1rem;
+      }
+
+      .current-query {
+        color: #333;
+        font-style: italic;
+      }
+    }
+  }
+
+  // Responsive Design
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .portal-header {
+      margin-bottom: 2rem;
+
+      h1 {
+        font-size: 2rem;
+      }
+    }
+
+    .research-options {
+      grid-template-columns: 1fr;
+      padding: 1rem;
+
+      .new-research,
+      .research-tips {
+        padding: 1rem;
+      }
+    }
+
+    .deep-research {
+      padding: 1rem;
+      margin-top: -1rem;
+
+      .deep-research-header {
+        margin: -1rem -1rem 1rem -1rem;
+        padding: 1rem;
+      }
+
+      .results-section {
+        .report-container {
+          grid-template-columns: 1fr;
+        }
+      }
+    }
+  }
+} 

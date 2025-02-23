@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-multipart
+google-generativeai
+python-dotenv==1.0.1
+tiktoken
+httpx
+firecrawl-py
+pydantic
+asyncio 
